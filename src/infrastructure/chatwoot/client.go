@@ -101,6 +101,11 @@ func NewClient() *Client {
 	}
 }
 
+func (c *Client) setAuthHeaders(req *http.Request) {
+	req.Header.Set("Api-Access-Token", c.APIToken)
+	req.Header.Set("api_access_token", c.APIToken)
+}
+
 func (c *Client) IsConfigured() bool {
 	return c.BaseURL != "" && c.APIToken != "" && c.AccountID != 0 && c.InboxID != 0
 }
@@ -122,7 +127,7 @@ func (c *Client) FindContactByIdentifier(identifier string, isGroup bool) (*Cont
 	q := req.URL.Query()
 	q.Add("q", searchTerm)
 	req.URL.RawQuery = q.Encode()
-	req.Header.Set("api_access_token", c.APIToken)
+	c.setAuthHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -196,7 +201,7 @@ func (c *Client) CreateContact(name, identifier string, isGroup bool) (*Contact,
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("api_access_token", c.APIToken)
+	c.setAuthHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -277,7 +282,7 @@ func (c *Client) UpdateContactName(contactID int, name string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("api_access_token", c.APIToken)
+	c.setAuthHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -301,7 +306,7 @@ func (c *Client) FindConversation(contactID int) (*Conversation, error) {
 		return nil, err
 	}
 
-	req.Header.Set("api_access_token", c.APIToken)
+	c.setAuthHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -360,7 +365,7 @@ func (c *Client) CreateConversation(contactID int) (*Conversation, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("api_access_token", c.APIToken)
+	c.setAuthHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -425,7 +430,7 @@ func (c *Client) CreateMessage(conversationID int, content string, messageType s
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("api_access_token", c.APIToken)
+	c.setAuthHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -502,7 +507,7 @@ func (c *Client) createMessageWithAttachments(endpoint, content, messageType str
 	}
 
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("api_access_token", c.APIToken)
+	c.setAuthHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
